@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-public class BinderProxyHookHandler implements InvocationHandler {
+public class HookedBinderProxyHandler implements InvocationHandler {
 
     private static final String TAG = "BinderProxyHookHandler";
 
@@ -15,7 +15,7 @@ public class BinderProxyHookHandler implements InvocationHandler {
     private Class<?> mStub;
     private Class<?> mIInterface;
 
-    public BinderProxyHookHandler(IBinder base) {
+    public HookedBinderProxyHandler(IBinder base) {
         mBase = base;
         try {
             mStub = Class.forName("android.content.IClipboard$Stub");
@@ -29,10 +29,11 @@ public class BinderProxyHookHandler implements InvocationHandler {
     public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
 
         if ("queryLocalInterface".equals(method.getName())) {
-            Log.d(TAG, "queryLocalInterface , return a proxy");
-            return Proxy.newProxyInstance(o.getClass().getClassLoader(),
+            Log.d(TAG, "queryLocalInterface , return a hooked Binder.");
+            return Proxy.newProxyInstance(
+                    o.getClass().getClassLoader(),
                     new Class[]{mIInterface},
-                    new BinderHookHandler(mBase, mStub));
+                    new HookedBinderHandler(mBase, mStub));
         }
 
         return method.invoke(mBase, objects);

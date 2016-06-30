@@ -8,21 +8,25 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
-public class BinderHookHelper {
+public class HookBinderHelper {
 
     @SuppressWarnings("unchecked")
     public static void hookClipboardService() throws Exception {
         Class<?> serviceManager = Class.forName("android.os.ServiceManager");
         Method getService = serviceManager.getDeclaredMethod("getService", String.class);
 
+        //get the raw Binder Proxy
         IBinder rawBinder = (IBinder) getService.invoke(null, Context.CLIPBOARD_SERVICE);
-        IBinder hookedBinder = (IBinder) Proxy.newProxyInstance(serviceManager.getClassLoader(),
+        //create hooked Binder Proxy
+        IBinder hookedBinderProxy = (IBinder) Proxy.newProxyInstance(
+                serviceManager.getClassLoader(),
                 new Class<?>[]{IBinder.class},
-                new BinderProxyHookHandler(rawBinder));
+                new HookedBinderProxyHandler(rawBinder));
 
+        //replace the Binder Proxy
         Field cacheField = serviceManager.getDeclaredField("sCache");
         cacheField.setAccessible(true);
         Map<String, IBinder> cache = (Map) cacheField.get(null);
-        cache.put(Context.CLIPBOARD_SERVICE, hookedBinder);
+        cache.put(Context.CLIPBOARD_SERVICE, hookedBinderProxy);
     }
 }

@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import me.com.hookdemo.binderhook.BinderHookHelper;
+import me.com.hookdemo.binderhook.HookBinderHelper;
 import me.com.hookdemo.hook.HookHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         try {
-            BinderHookHelper.hookClipboardService();
+            HookBinderHelper.hookClipboardService();
         } catch (Exception e) {
             Log.e(TAG, "hook exception", e);
         }

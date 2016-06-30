@@ -7,13 +7,13 @@ import android.util.Log;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-public class BinderHookHandler implements InvocationHandler {
+public class HookedBinderHandler implements InvocationHandler {
 
     private static final String TAG = "BinderHookHandler";
 
     private Object mBase;
 
-    public BinderHookHandler(IBinder base, Class<?> subClass) {
+    public HookedBinderHandler(IBinder base, Class<?> subClass) {
         try {
             Method asInterfaceMethod = subClass.getDeclaredMethod("asInterface", IBinder.class);
             mBase = asInterfaceMethod.invoke(null, base);
