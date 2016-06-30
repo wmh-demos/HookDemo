@@ -5,36 +5,51 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import me.com.hookdemo.binderhook.BinderHookHelper;
 import me.com.hookdemo.hook.HookHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String TAG = "MainActivity";
+
+    private Button mButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-        Button tv = new Button(this);
-        tv.setText("测试界面");
+        setContentView(R.layout.activity_main);
 
-        setContentView(tv);
+        try {
+            BinderHookHelper.hookClipboardService();
+        } catch (Exception e) {
+            Log.e(TAG, "hook exception", e);
+        }
 
-        tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setData(Uri.parse("http://www.baidu.com"));
+        initView();
+    }
 
-                // 注意这里使用的ApplicationContext 启动的Activity
-                // 因为Activity对象的startActivity使用的并不是ContextImpl的mInstrumentation
-                // 而是自己的mInstrumentation, 如果你需要这样, 可以自己Hook
-                // 比较简单, 直接替换这个Activity的此字段即可.
-                getApplicationContext().startActivity(intent);
-            }
-        });
+    private void initView() {
+        mButton = (Button) findViewById(R.id.button);
+        mButton.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view == mButton) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setData(Uri.parse("http://www.baidu.com"));
+
+            // 注意这里使用的ApplicationContext 启动的Activity
+            // 因为Activity对象的startActivity使用的并不是ContextImpl的mInstrumentation
+            // 而是自己的mInstrumentation, 如果你需要这样, 可以自己Hook
+            // 比较简单, 直接替换这个Activity的此字段即可.
+            getApplicationContext().startActivity(intent);
+        }
     }
 
     @Override
@@ -45,5 +60,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }
