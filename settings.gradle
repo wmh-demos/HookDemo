@@ -1,1 +1,1 @@
-include ':app'
+include ':binder-hook', ':ams-pms-hook'
