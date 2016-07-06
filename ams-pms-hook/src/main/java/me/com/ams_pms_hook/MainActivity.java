@@ -38,9 +38,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void attachBaseContext(Context newBase) {
         try {
             HookHelper.hookActivityManager();
+            HookHelper.hookPackageManager(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
         super.attachBaseContext(newBase);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }
